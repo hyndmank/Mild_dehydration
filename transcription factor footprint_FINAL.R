@@ -21,7 +21,7 @@ Idents(combined) <-"celltype"
 Idents(combined) <-"celltype.groupid"
 Idents(combined) <-"celltype.sex"
 
-# extract position frequency matrices for the motifs:  NCBI tax ids Mus 10090, Homo 9606
+# extract position frequency matrices for the motifs:  NCBI tax ids Mus 10090
 pfm <- getMatrixSet(
   x = JASPAR2020,
   opts = list(collection = "CORE", tax_group = 'vertebrates', all_versions = FALSE))
@@ -138,7 +138,6 @@ MotifPlot(
   object = combined,
   motifs = "CREM"
 )
-
 
 ###################################sex differences#################
 DefaultAssay(combined) <- "peaks"
