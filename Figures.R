@@ -16,27 +16,17 @@ library(BSgenome.Mmusculus.UCSC.mm10)
 library(limma)
 library(openxlsx)
 
-DefaultAssay(combined) <- "SCT"
-DefaultAssay(combined) <- "Gene"
-DefaultAssay(combined) <- "RNA"
-Idents(combined) <- "celltype"
-Idents(combined) <- "celltype.groupid"
-levels(combined) <- c("Podocyte", "Parietal", "mPTS1", "mPTS2", "mPTS3","fPTS1","fPTS2", "fPTS3", "mdTL", "fdTL", "dTL", "mTAL", "cTAL1","cTAL2", "cTAL3", "DCT1", "DCT2", "DCT2b", "CNT1", "CNT2", "CNT3", "CNT-PC", "CDPC", "IMCD", "ICa", "ICb", "Peritubular_EC", "VR1", "VR2", "VR3", "Fibroblast", "med_Fibro", "Monocytes", "Tcell")
-
-#export barcode ids
-Idents(combined) <- "celltype"
-dehydrate_barcodes <-Idents(combined)
-write.csv(dehydrate_barcodes, file = "/data/user/hyndmank/multiomic/combined2021/22_FINAL/dehydratebarcodes.csv")
 
 # first compute the GC content for each peak
 combined <- RegionStats(combined, genome = BSgenome.Mmusculus.UCSC.mm10)
 saveRDS(combined, file = "~/Desktop/Dehydration/combined.rds")
+
 # link peaks to genes
 combined <- LinkPeaks(
   object = combined,
   peak.assay = "peaks",
   expression.assay = "RNA",
-  genes.use = c("Aqp2", "Aqp3", "Aqp4", "Aqp1", "Aqp6", "Avpr2", "Pde10a", "Atp1a1", "Atp1b1", "Grem2", "Btc", "Crem", "Hdac7", "Grem1")
+  genes.use = c("Aqp2", "Aqp3", "Aqp4", "Aqp1", "Aqp5", "Avpr2", "Pde10a", "Atp1a1", "Atp1b1", "Grem2", "Btc", "Crem", "Grem1", "Nfat5")
 )
 
 #Visualizations Used in the publication.
@@ -421,7 +411,6 @@ CoveragePlot(
 
 
 #AQP5
-
 DefaultAssay(combined) <- "peaks"
 Idents(combined) <- "celltype.groupid"
 CoveragePlot(
@@ -429,66 +418,6 @@ CoveragePlot(
   region = "Aqp5", idents = c("CDPC_adlib", "CDPC_dehydrated"),
     extend.upstream = 10000,
   extend.downstream = 10000) 
-
-
-
-
-
-
-
-FeaturePlot(combined, features = "Avpr2", split.by = "groupid")#780x429
-CoveragePlot(combined, region = 'Avpr2', features = 'Avpr2', assay = 'peaks', expression.assay = 'RNA', peaks = FALSE, extend.upstream = 1000, extend.downstream = 1000)#1242x699
-
-FeaturePlot(combined, features = "Aqp3", split.by = "groupid")#780x429
-FeaturePlot(combined, features = "Aqp3")
-CoveragePlot(combined, region = 'Aqp3', features = 'Aqp3', assay = 'peaks', expression.assay = 'RNA', peaks = FALSE, extend.upstream = 1000, extend.downstream = 1000)#1242x699
-
-FeaturePlot(combined, features = "Aqp4", split.by = "groupid")#780x429
-FeaturePlot(combined, features = "Aqp4")
-
-FeaturePlot(combined, features = "Aqp1", split.by = "groupid")#780x429
-FeaturePlot(combined, features = "Aqp1")
-
-FeaturePlot(combined, features = "Grem2", split.by = "groupid")#780x429
-FeaturePlot(combined, features = "Grem2")
-
-FeaturePlot(combined, features = "Crem", split.by = "groupid")#780x429
-FeaturePlot(combined, features = "Crem")
-
-FeaturePlot(combined, features = "Pappa", split.by = "groupid")#780x429
-FeaturePlot(combined, features = "Pappa")
-
-FeaturePlot(combined, features = "Pde10a", split.by = "groupid")#780x429
-FeaturePlot(combined, features = "Pde10a")#780x429
-
-CoveragePlot(combined, region = 'Pde10a', features = 'Pde10a', assay = 'peaks', expression.assay = 'RNA', peaks = FALSE, extend.upstream = 10000, extend.downstream = 10000)#1242x699
-
-FeaturePlot(combined, features = "Atp1b1")#780x429
-
-FeaturePlot(combined, features = "Atp1a1", split.by = "groupid")#780x429
-CoveragePlot(combined, region = 'Atp1a1', features = 'Atp1a1', assay = 'peaks', expression.assay = 'RNA', peaks = FALSE, extend.upstream = 10000, extend.downstream = 10000)#1242x699
-
-FeaturePlot(combined, features = "Atp1b1", split.by = "groupid")#780x429
-CoveragePlot(combined, region = 'Atp1b1', features = 'Atp1b1', assay = 'peaks', expression.assay = 'RNA', peaks = FALSE, extend.upstream = 10000, extend.downstream = 10000)#1242x699
-
-FeaturePlot(combined, features = "Grem2", split.by = "groupid")#780x429
-CoveragePlot(combined, region = 'Grem2', features = 'Grem2', assay = 'peaks', expression.assay = 'RNA', peaks = FALSE, extend.upstream = 10000, extend.downstream = 10000)#1242x699
-
-
-#Linking peaks to genes
-DefaultAssay(combined) <- 'peaks'
-Idents(combined) <- "celltype.groupid"
-
-# first compute the GC content for each peak
-combined <- RegionStats(combined, genome = BSgenome.Mmusculus.UCSC.mm10)
-saveRDS(combined, file = "~/Desktop/Dehydration/combined.rds")
-# link peaks to genes
-combined <- LinkPeaks(
-  object = combined,
-  peak.assay = "peaks",
-  expression.assay = "RNA",
-  genes.use = c("Aqp2", "Aqp3", "Aqp4", "Aqp1", "Aqp6", "Avpr2", "Pde10a", "Atp1a1", "Atp1b1", "Grem2", "Btc", "Crem", "Hdac7", "Grem1")
-)
 
 idents.plot <- c("CDPC_adlib", "CDPC_dehydrated")
 idents.plot.m <- c("mPTS1_adlib", "mPTS1_dehydrated", "mPTS2_adlib", "mPTS2_dehydrated", "mPTS3_adlib", "mPTS3_dehydrated")
@@ -603,117 +532,3 @@ p10 <- CoveragePlot(
   extend.upstream = 8000,
   extend.downstream = 5000, annotation = TRUE)
 p10
-
-
-
-DefaultAssay(combined) <- "Gene"
-DefaultAssay(combined) <- "RNA"
-features <- c("Aqp1", "Aqp2", "Aqp3", "Aqp4", "Avpr2", "Pde10a", "Atp1a1", "Atp1b1")
-Aqp <- c("Aqp1", "Aqp2", "Aqp3", "Aqp4", "Aqp5", "Aqp6", "Aqp7", "Aqp8", "Aqp9", "Aqp10", "Aqp11")
-
-Idents(combined) <- "celltype"
-Idents(combined) <- "celltype.groupid"
-RidgePlot(combined, features = "Aqp2", ncol = 2)
-DoHeatmap(combined, features = features, size = 3, ) #1700x625
-DotPlot(combined, features = features, split.by = 'groupid') + RotatedAxis() #825x625
-VlnPlot(combined, features = features)#1800x1000
-VlnPlot(combined, features = "Aqp2", split.by = 'groupid')#975x575
-VlnPlot(combined, features = "Aqp3", split.by = 'groupid')#975x575
-VlnPlot(combined, features = "Aqp4", split.by = 'groupid')#975x575
-VlnPlot(combined, features = "Aqp1", split.by = 'groupid')#975x575
-VlnPlot(combined, features = "Pde10a", split.by = 'groupid')#975x575
-VlnPlot(combined, features = "Nfat5", split.by = 'groupid')#975x575
-
-Aqp <- c("Aqp1", "Aqp2", "Aqp3", "Aqp4", "Aqp5", "Aqp6", "Aqp7", "Aqp8", "Aqp9", "Aqp10", "Aqp11")
-DoHeatmap(combined, features = Aqp, size = 3, combine = TRUE ) #1700x625
-
-
-
-
-
-
-DefaultAssay(combined) <- "RNA"
-Idents(combined) <- "celltype"
-FeaturePlot(combined, features = "Rbbp8nl", split.by = "groupid", min.cutoff = 0, max.cutoff =3)
-VlnPlot(
-  object = combined,
-  assay = 'RNA',
-  features = "Aqp5",
-  pt.size = 0.5,
-  split.by = "groupid",cols=c("darkolivegreen3", "deepskyblue"))+ NoLegend()  & theme(axis.title.x = element_blank(),  plot.title = element_blank(), axis.title.y = element_blank()) 
-
-VlnPlot(
-  object = combined,
-  assay = 'Gene',
-  features = "Crem",
-  pt.size = 0.5,
-  idents = 'CDPC',
-  split.by = "groupid",cols=c("darkolivegreen3", "deepskyblue"))+ NoLegend()  & theme(axis.title.x = element_blank(), axis.text.x = element_blank(), plot.title = element_blank(), axis.title.y = element_blank()) 
-
-#############################GRANT STUFF#########################
-#Grem1 700x400
-FeaturePlot(combined, features = "Grem1", split.by = "groupid", min.cutoff = 0, max.cutoff =3) #
-FeaturePlot(combined, features = "Grem1", min.cutoff = 0, max.cutoff =3)
-#RNA summary 250x400
-VlnPlot(
-  object = combined,
-  assay = 'RNA',
-  features = "Grem1",
-  pt.size = 0.5,
-  idents = "CDPC",
-  split.by = "groupid",cols=c("darkolivegreen3", "deepskyblue")) + NoLegend() & theme(axis.title.x = element_blank(), axis.text.x = element_blank(), plot.title = element_blank(), axis.title.y = element_blank()) 
-
-#chromatin summary 250x400
-DefaultAssay(combined) <- "peaks"
-VlnPlot(
-  object = combined,
-  assay = 'Gene',
-  features = "Grem1",
-  pt.size = 0.5,
-  idents = "CDPC",
-  split.by = "groupid",cols=c("darkolivegreen3", "deepskyblue")) + NoLegend() & theme(axis.title.x = element_blank(), axis.text.x = element_blank(), plot.title = element_blank(), axis.title.y = element_blank()) 
-
-DefaultAssay(combined) <- "peaks"
-Idents(combined) <- "celltype.groupid"
-CoveragePlot(
-  object = combined,
-  region = "Grem1",
-  idents = c("CDPC_adlib", "CDPC_dehydrated"),
-  extend.upstream = 10000,
-  extend.downstream = 10000) & scale_fill_manual(values = c("darkolivegreen3", "deepskyblue"))
-DefaultAssay(combined) <- "peaks"
-combined <- LinkPeaks(
-  object = combined,
-  peak.assay = "peaks",
-  expression.assay = "RNA",
-  genes.use = c("Aqp2", "Aqp3", "Aqp4", "Aqp1", "Aqp6", "Avpr2", "Pde10a", "Atp1a1", "Atp1b1", "Grem2", "Btc", "Crem", "Hdac7")
-)
-Idents(combined) <- "celltype.groupid"
-idents.plot <- c("CDPC_adlib", "CDPC_dehydrated")
-p11 <- CoveragePlot(
-  object = combined,
-  region = "Hdac7",
-  features = "Hdac7",
-  expression.assay = "RNA",
-  idents = idents.plot,
-  extend.upstream = 10000,
-  extend.downstream = 10000
-)
-p11
-
-p12 <- CoveragePlot(
-  object = combined,
-  region = "Crem",
-  features = "Crem",
-  expression.assay = "RNA",
-  idents = idents.plot,
-  extend.upstream = 10000,
-  extend.downstream = 10000
-)
-p12
-
-DefaultAssay(combined) <- "RNA"
-RidgePlot(combined, features = "Hdac7", ncol = 2, idents = idents.plot)+NoLegend()
-RidgePlot(combined, features = "Hdac7", ncol = 2, idents = c("CNT2_adlib", "CNT2_dehydrated"))+NoLegend()
-FeaturePlot(combined, features = "Hdac7", split.by = "groupid") 
-
