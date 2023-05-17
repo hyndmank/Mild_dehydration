@@ -18,7 +18,6 @@ library(openxlsx)
 library(tidyverse)
 (future.globals.maxSize = 150000 * 1024^2)
 
-
 # create a Seurat object containing the RNA adata
 # load the RNA data
 counts.630 <- Read10X("~/Desktop/Dehydration/630/outs/filtered_feature_bc_matrix")
@@ -287,8 +286,8 @@ sample_636$sex <- 'female'
 sample_638$sex <- 'male'
 sample_641$sex <- 'male'
 
-#signac says we need to recall peaks with MACS2.  I have MACS2 loaded in my NGS environment
-peaks.630 <- CallPeaks(sample_630, macs2.path = "/Users/kellyhyndman/NGS_env/bin/macs3")
+#recall peaks with MACS2.  I have MACS2 loaded in my NGS environment
+peaks.630 <- CallPeaks(sample_630, macs2.path = "/NGS_env/bin/macs3")
 
 # remove peaks on nonstandard chromosomes and in genomic blacklist regions
 peaks.630 <- keepStandardChromosomes(peaks.630, pruning.mode = "coarse")
@@ -301,7 +300,7 @@ macs2_counts.630 <- FeatureMatrix(
   cells = colnames(sample_630)
 )
 
-# create a new assay using the MACS3 peak set and add it to the Seurat object. the Assay Peaks is the new called peaks that are better than cellranger.
+#create a new assay using the MACS3 peak set and add it to the Seurat object. The assay "peaks" is the new called peaks.  "ATAC" assay is the cellranger called peaks.
 sample_630[["peaks"]] <- CreateChromatinAssay(
   counts = macs2_counts.630,
   fragments = frags.630,
@@ -314,7 +313,7 @@ sample_630
 #Active assay: ATAC (117110 features, 0 variable features)
 #2 other assays present: RNA, peaks
 
-peaks.636 <- CallPeaks(sample_636, macs2.path = "/Users/kellyhyndman/NGS_env/bin/macs3")
+peaks.636 <- CallPeaks(sample_636, macs2.path = "/NGS_env/bin/macs3")
 peaks.636 <- keepStandardChromosomes(peaks.636, pruning.mode = "coarse")
 peaks.636 <- subsetByOverlaps(x = peaks.636, ranges = blacklist_mm10, invert = TRUE)
 macs2_counts.636 <- FeatureMatrix(
@@ -334,7 +333,7 @@ sample_636
 #Active assay: ATAC (113930 features, 0 variable features)
 #2 other assays present: RNA, peaks
 
-peaks.638 <- CallPeaks(sample_638, macs2.path = "/Users/kellyhyndman/NGS_env/bin/macs3")
+peaks.638 <- CallPeaks(sample_638, macs2.path = "/NGS_env/bin/macs3")
 peaks.638 <- keepStandardChromosomes(peaks.638, pruning.mode = "coarse")
 peaks.638 <- subsetByOverlaps(x = peaks.638, ranges = blacklist_mm10, invert = TRUE)
 macs2_counts.638 <- FeatureMatrix(
@@ -355,7 +354,7 @@ sample_638
 #Active assay: ATAC (120380 features, 0 variable features)
 #2 other assays present: RNA, peaks
 
-peaks.641 <- CallPeaks(sample_641, macs2.path = "/Users/kellyhyndman/NGS_env/bin/macs3")
+peaks.641 <- CallPeaks(sample_641, macs2.path = "/NGS_env/bin/macs3")
 peaks.641 <- keepStandardChromosomes(peaks.641, pruning.mode = "coarse")
 peaks.641 <- subsetByOverlaps(x = peaks.641, ranges = blacklist_mm10, invert = TRUE)
 macs2_counts.641 <- FeatureMatrix(
@@ -376,16 +375,8 @@ sample_641
 #Active assay: ATAC (116751 features, 0 variable features)
 #2 other assays present: RNA, peaks
 
-DefaultAssay(sample_630) <- "RNA"
-sample_630<-SCTransform(sample_630)
-sample_638<-SCTransform(sample_638)
-sample_636<-SCTransform(sample_636)
-sample_641<-SCTransform(sample_641)
-
-
-
-
-
+#We normalize and scale each sample individually first.  But then do it again on the merged item. Seemed to make little difference.
+#Run LogNormalize on each sample.  
 sample_630 <-NormalizeData(sample_630, normalization.method = "LogNormalize", scale.factor = 10000)
 sample_630 <- FindVariableFeatures(sample_630, selection.method = "vst", nfeatures = 2000)
 all.genes <- rownames(sample_630)
@@ -401,6 +392,7 @@ sample_630 <- RunUMAP(sample_630, dims = 1:20, reduction.name = 'umap.rna', redu
 p630 <- DimPlot(sample_630, label = TRUE)
 p630
 
+#normalize the peaks asaay
 DefaultAssay(sample_630) <- "peaks"
 sample_630 <- RunTFIDF(sample_630)
 sample_630 <- FindTopFeatures(sample_630, min.cutoff = 'q0')
@@ -509,9 +501,9 @@ combined[["ATAC"]]
 
 saveRDS(combined, file = "~/Desktop/Dehydration/combined.rds")
 DimPlot(combined)
+
 #Gene expression data processing
 #We can normalize the gene expression data using SCTransform or lognorm, and reduce the dimensionality using PCA.
-
 DefaultAssay(combined) <- "RNA"
 combined <-NormalizeData(combined, normalization.method = "LogNormalize", scale.factor = 10000)
 combined <- FindVariableFeatures(combined, selection.method = "vst", nfeatures = 2000)
@@ -532,7 +524,7 @@ p3
 combined.marker.RNA <- FindAllMarkers(combined, assay = "RNA", only.pos = TRUE, min.pct = 0.25, logfc.threshold = 0.25)
 combined.marker.RNA %>% group_by(cluster) %>% top_n(n = 2, wt = avg_log2FC)
 write.csv(combined.marker.RNA, file = "~/Desktop/Dehydration/RNAmarkers.csv")
-saveRDS(combined, file = "/data/user/hyndmank/multiomic/dehydration2021/22_FINAL/combined.rds")
+saveRDS(combined, file = "/combined.rds")
 
 #SCTtransform
 DefaultAssay(combined) <- "RNA"
@@ -541,11 +533,16 @@ combined <- RunPCA(combined)
 combined <- FindNeighbors(combined, dims = 1:20)
 combined <- FindClusters(combined, resolution = 1.4)
 combined <- RunUMAP(combined, dims = 1:20, reduction.name = 'umap.rna', reduction.key = 'rnaUMAP_')
-p1a <- DimPlot(combined, label = TRUE)
-p1a
+p4 <- DimPlot(combined, label = TRUE, reduction = 'umap.sct')
+p4
 sctcombined.marker <- FindAllMarkers(combined, assay = "SCT", only.pos = TRUE, min.pct = 0.25, logfc.threshold = 0.25)
-write.csv(sctcombined.marker, file = "~/Desktop/Dehydration/RNAmarkers.csv")
-saveRDS(combined, file = "/data/user/hyndmank/multiomic/dehydration2021/22_FINAL/combined.rds")
+write.csv(sctcombined.marker, file = "~/Desktop/Dehydration/SCTRNAmarkers.csv")
+saveRDS(combined, file = "/combined.rds")
+
+combined[["SCT"]]
+#SCTAssay data with 22072 features for 19837 cells, and 1 SCTModel(s) 
+#Top 10 variable features:
+#Slc8a1, Slc12a3, Slc12a1, Slc26a4, Lsamp, Slc7a12, Egf, Sgcz, Erbb4, Aadat 
 
 #Peaks normalization and scaling.
 DefaultAssay(combined) <- "peaks"
@@ -562,27 +559,21 @@ combined <- NormalizeData(
   scale.factor = median(combined$nCount_Gene))
 saveRDS(combined, file = "~/Desktop/Dehydration/combined.rds")
 
-
 VariableFeatures(combined[["SCT"]]) <- rownames(combined[["SCT"]]@scale.data)
 features <- SelectIntegrationFeatures(object.list = combined)
-
 
 DefaultAssay(combined) <- "RNA"
 DefaultAssay(combined) <- "peaks"
 DefaultAssay(combined) <- "ATAC"
 DefaultAssay(combined) <- "SCT"
 DefaultAssay(combined) <- "Gene"
-DimPlot(object = combined, label = TRUE, repel = TRUE)
-
-DimPlot(combined, label = TRUE, group.by = "sex")
-
 
 #DAC for clusters
-DefaultAssay(dehydration) <- "peaks"
-Idents(dehydration) <- "celltype"
+DefaultAssay(combined) <- "peaks"
+Idents(combined) <- "celltype"
 GetMarkers <- function(cluster, seurat_aggregate) {
   print(paste0("Finding dac for: ",cluster))
-  dehydration <- seurat_aggregate
+  combined <- seurat_aggregate
   dac <- FindMarkers(dehydration, 
                      ident.1 = cluster,  
                      logfc.threshold = 0.25,
@@ -593,72 +584,62 @@ GetMarkers <- function(cluster, seurat_aggregate) {
   open <- rownames(dac)  
   cf <- ClosestFeature(dehydration, regions = open)
   return(cbind(dac, gene=cf$gene_name, distance=cf$distance))}
-idents <- levels(dehydration@meta.data$celltype)
-list.cluster.dac <- lapply(idents, function(x) {GetMarkers(x, seurat_aggregate = dehydration)})
-write.xlsx(list.cluster.dac, file = "/data/user/hyndmank/multiomic/dehydration2021/22_FINAL/clusterdac.xlsx", sheetName = idents, rowNames = T)
-
-write.csv(peakscombined.marker, file = "/data/user/hyndmank/multiomic/dehydration2021/22_FINAL/peaksmarkers22.csv")
-saveRDS(dehydration, file = "/data/user/hyndmank/multiomic/dehydration2021/22_FINAL/dehydration.rds")
-
-dac <- FindAllMarkers(dehydration, 
-                   test.use = 'LR', 
-                   min.pct = 0.1,
-                   latent.vars = 'atac_peak_region_fragments')
-
-write.csv(dac, file = "/data/user/hyndmank/multiomic/dehydration2021/22_FINAL/peaksmarkers22.csv")
-
+idents <- levels(combined@meta.data$celltype)
+list.cluster.dac <- lapply(idents, function(x) {GetMarkers(x, seurat_aggregate = combined)})
+write.xlsx(list.cluster.dac, file = "/clusterdac.xlsx", sheetName = idents, rowNames = T)
+saveRDS(combined, file = "/dehydration.rds")
 
 
 #ran files on local mac with Azimuth to get ideas of cell ideas by cross referencing the findallmarkers with azimuth.
 #export a smaller file for Azimuth
-DefaultAssay(dehydration) <- "RNA"
-Azi <- DietSeurat(object = dehydration, assays = "RNA")
-saveRDS(Azi, file = "/data/user/hyndmank/multiomic/dehydration2021/22_FINAL/combineazi.rds")
+DefaultAssay(combined) <- "RNA"
+Azi <- DietSeurat(object = combined, assays = "RNA")
+saveRDS(Azi, file = "/combineazi.rds")
 
 #export this file and run Azimuth on webinterface.  Then manually cross reference with Cell cluster DEGs.
 #now will rename idents
-dehydration <- RenameIdents(dehydration, '0' = "fPTS3", '1' = "mPTS3", '2' = "fPTS1", '3' = "cTAL2", '4' = "Peritubular_EC", '5' = "fdTL", '6' = "mPTS2", '7' = "mPTS3", '8' = "mTAL", '9' = "mdTL", '10' = "fPTS2", '11' = "DCT1", '12' = "mPTS1",  '13' = "cTAL1", '14' = "DCT2", '15' = "mPTS1", '16' = "CDPC", '17' = "Fibroblast", '18' = "CNT2", '19' = "fPTS1", '20' = "VR1", '21' = "ICa", '22' = "dTL", '23'="cTAL3", '24'= "ICb", '25'='Monocytes', '26'="CNT1", '27' = "med_Fibro", '28' = "IMCD", "29"= "DCT2b", '30' = "CNT-PC", '31' = "Podocyte", '32' = "Tcell", '33'="Parietal", '34' = "VR2", '35' = "CNT3", '36'="VR3")
-dehydration$celltype <- Idents(dehydration)
-dehydration <- RenameIdents(dehydration, 'cTAL' = "cTAL2")
-levels(dehydration) <- c("Podocyte", "Parietal", "mPTS1", "mPTS2", "mPTS3","fPTS1","fPTS2", "fPTS3", "mdTL", "fdTL", "dTL", "mTAL", "cTAL1","cTAL2", "cTAL3", "DCT1", "DCT2", "DCT2b", "CNT1", "CNT2", "CNT3", "CNT-PC", "CDPC", "IMCD", "ICa", "ICb", "Peritubular_EC", "VR1", "VR2", "VR3", "Fibroblast", "med_Fibro", "Monocytes", "Tcell")
+combined <- RenameIdents(combined, '0' = "fPTS3", '1' = "mPTS3", '2' = "fPTS1", '3' = "cTAL2", '4' = "Peritubular_EC", '5' = "fdTL", '6' = "mPTS2", '7' = "mPTS3", '8' = "mTAL", '9' = "mdTL", '10' = "fPTS2", '11' = "DCT1", '12' = "mPTS1",  '13' = "cTAL1", '14' = "DCT2", '15' = "mPTS1", '16' = "CDPC", '17' = "Fibroblast", '18' = "CNT2", '19' = "fPTS1", '20' = "VR1", '21' = "ICa", '22' = "dTL", '23'="cTAL3", '24'= "ICb", '25'='Monocytes', '26'="CNT1", '27' = "med_Fibro", '28' = "IMCD", "29"= "DCT2b", '30' = "CNT-PC", '31' = "Podocyte", '32' = "Tcell", '33'="Parietal", '34' = "VR2", '35' = "CNT3", '36'="VR3")
+combined$celltype <- Idents(combined)
+combined <- RenameIdents(combined, 'cTAL' = "cTAL2")
+levels(combined) <- c("Podocyte", "Parietal", "mPTS1", "mPTS2", "mPTS3","fPTS1","fPTS2", "fPTS3", "mdTL", "fdTL", "dTL", "mTAL", "cTAL1","cTAL2", "cTAL3", "DCT1", "DCT2", "DCT2b", "CNT1", "CNT2", "CNT3", "CNT-PC", "CDPC", "IMCD", "ICa", "ICb", "Peritubular_EC", "VR1", "VR2", "VR3", "Fibroblast", "med_Fibro", "Monocytes", "Tcell")
 
-p1 <-DimPlot(object = dehydration, label = TRUE, repel = TRUE)
+p1 <-DimPlot(object = combined, label = TRUE, repel = TRUE)
 p1
 
-saveRDS(dehydration, file = "/data/user/hyndmank/multiomic/dehydration2021/22_FINAL/dehydration.rds")
+saveRDS(dehydration, file = "/combined.rds")
 
 #get cell counts etc
-table(Idents(dehydration))
-table(dehydration$groupid)
-table(dehydration$sex)
-table(Idents(dehydration), dehydration$groupid)
-table(Idents(dehydration), dehydration$sex)
-prop.table(table(Idents(dehydration)))
-prop.table(table(Idents(dehydration), dehydration$groupid), margin = 2)
+table(Idents(combined))
+table(combined$groupid)
+table(combined$sex)
+table(Idents(combined), combined$groupid)
+table(Idents(combined), combined$sex)
+prop.table(table(Idents(combined)))
+prop.table(table(Idents(combined), combined$groupid), margin = 2)
 
 #to change idents to separate con and KO. Original Clusters are in meta$seurat_clusters.  Then we can separate based on sex.
-dehydration$celltype.groupid <- paste(Idents(dehydration), dehydration$groupid, sep = "_")
-Idents(dehydration) <- "celltype.groupid"
-dehydration$celltype.sex <- paste(Idents(dehydration), dehydration$sex, sep = "_")
-Idents(dehydration) <- "celltype"
-Idents(dehydration) <- "celltype.sex"
-Idents(dehydration) <-"seurat_clusters"
+combined$celltype.groupid <- paste(Idents(combined), combined$groupid, sep = "_")
+Idents(combined) <- "celltype.groupid"
+combined$celltype.sex <- paste(Idents(combined), dehydration$sex, sep = "_")
+Idents(combined) <- "celltype"
+Idents(combined) <- "celltype.sex"
+Idents(combined) <-"seurat_clusters"
 
-DimPlot(object = dehydration, label = TRUE, repel = TRUE) + NoLegend()
-DimPlot(object = dehydration, label = TRUE, repel = TRUE) 
+DimPlot(object = combined, label = TRUE, repel = TRUE) + NoLegend()
+DimPlot(object = combined, label = TRUE, repel = TRUE) 
 
-saveRDS(dehydration, file = "/data/user/hyndmank/multiomic/dehydration2021/multiome_Final/dehydration.rds")
+saveRDS(dehydration, file = "combined/combined.rds")
 
 #export barcode ids
-Idents(dehydration) <- "celltype"
-dehydrate_barcodes <-Idents(dehydration)
-write.csv(dehydrate_barcodes, file = "/data/user/hyndmank/multiomic/dehydration2021/22_FINAL/dehydratebarcodes.csv")
+Idents(combined) <- "celltype"
+combined_barcodes <-Idents(combined)
+write.csv(combined_barcodes, file = "/barcodes.csv")
 
-#DEG
-DefaultAssay(dehydration) <- "RNA"
-output <- "/data/user/hyndmank/multiomic/dehydration2021/22_FINAL/test/DES_"
-Idents(dehydration) <- "celltype"
-for (i in (levels(dehydration)))({
+#####################################################################DEG
+DefaultAssay(combined) <- "RNA"
+output <- "/test/DES_"
+Idents(combined) <- "celltype"
+for (i in (levels(combined)))({
   try({
     ident1 <- paste0(i,"_adlib")
     ident2 <- paste0(i,"_dehydrated")
