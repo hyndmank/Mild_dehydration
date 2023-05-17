@@ -547,7 +547,7 @@ prop.table(table(Idents(combined), combined$groupid), margin = 2)
 #export barcode ids
 Idents(combined) <- "celltype"
 dehydrate_barcodes <-Idents(combined)
-write.csv(dehydrate_barcodes, file = "~/Desktop/combined/DEG/dehydratebarcodes.csv")
+write.csv(dehydrate_barcodes, file = "~/Desktop/combined/DEG/barcodes.csv")
 
 #DEG
 DefaultAssay(combined) <- "RNA"
