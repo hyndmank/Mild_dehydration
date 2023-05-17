@@ -89,7 +89,7 @@ resdata$GeneType <- with(resdata, maps$GENEBIOTYPE[match(EnsemblID, maps$GENEID)
 resdata <- resdata %>% relocate(GeneType, .after = GeneName)
 
 write.csv(as.data.frame(resdata), 
-          file="/Users/kellyhyndman/Library/CloudStorage/Box-Box/Hyndman_Lab_Omics/BulkSEQ/23midkid/midkiodf_results.csv")
+          file="midkiodf_results.csv")
 
 #normalized counts
 normalized_counts <- merge(as.data.frame(normalized_counts), as.data.frame(counts(dds, normalized=TRUE)), by="row.names", sort=FALSE)
