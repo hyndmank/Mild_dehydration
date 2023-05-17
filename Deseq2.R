@@ -15,11 +15,11 @@ maps <- select(EnsDb.Mmusculus.v79, keys=keys, columns=c("GENENAME", "GENEBIOTYP
                keytype="GENEID")
 
 #All data
-setwd("/Users/kellyhyndman/Library/CloudStorage/Box-Box/Hyndman_Lab_Omics/BulkSEQ/23midkid")
-countData <- read.csv("/Users/kellyhyndman/Library/CloudStorage/Box-Box/Hyndman_Lab_Omics/BulkSEQ/23midkid/counts.csv", header = TRUE, row.names = 1)
+setwd()
+countData <- read.csv(counts.csv", header = TRUE, row.names = 1)
 countData <-as.matrix(countData)
 head(countData)
-metaData <- read.csv("/Users/kellyhyndman/Library/CloudStorage/Box-Box/Hyndman_Lab_Omics/BulkSEQ/23midkid/meta.csv", header = TRUE)
+metaData <- read.csv("meta.csv", header = TRUE)
 metaData
 
 dds <- DESeqDataSetFromMatrix(countData=countData, 
@@ -46,7 +46,6 @@ plotMA(result, main=paste0('Condition: Control vs. Treatment'), ylim=c(-5,5))
 rld <- rlogTransformation(dds, blind = TRUE)
 plotPCA(rld, intgroup = c("genotype"))
 
-
 #Plot counts for a single gene. Below is the plot for the gene with the lowest p-value:
 plotCounts(dds, gene=which.min(result$padj), intgroup='genotype', pch = 19)
 
@@ -56,7 +55,6 @@ meanSdPlot(assay(ntd))
 vsd <- vst(dds, blind=FALSE)
 
 meanSdPlot(assay(vsd))
-
 
 #heatmap of samples
 select <- order(rowMeans(counts(dds,normalized=TRUE)),
@@ -80,16 +78,6 @@ pheatmap(sampleDistMatrix,
 par(mar=c(8,5,2,2))
 boxplot(log10(assays(dds)[["cooks"]]), range=0, las=2)
 
-
-#extract top 250 up and down regulated genes
-n = 250 
-resOrdered <- result[order(result$padj),]
-topResults <- rbind( resOrdered[ resOrdered[,'log2FoldChange'] > 0, ][1:n,],
-                     resOrdered[ resOrdered[,'log2FoldChange'] < 0, ][n:1,] )
-topResults[c(1:5,(2*n-4):(2*n)), c('baseMean','log2FoldChange','padj')]  #print results for top and bottom 5 genes
-mcols(result)$description
-
-
 ## Merge with normalized count data
 resdata <- merge(as.data.frame(result), as.data.frame(counts(dds, normalized=TRUE)), by="row.names", sort=FALSE)
 names(resdata)[1] <- "EnsemblID"
@@ -103,7 +91,6 @@ resdata <- resdata %>% relocate(GeneType, .after = GeneName)
 write.csv(as.data.frame(resdata), 
           file="/Users/kellyhyndman/Library/CloudStorage/Box-Box/Hyndman_Lab_Omics/BulkSEQ/23midkid/midkiodf_results.csv")
 
-
 #normalized counts
 normalized_counts <- merge(as.data.frame(normalized_counts), as.data.frame(counts(dds, normalized=TRUE)), by="row.names", sort=FALSE)
 names(normalized_counts)[1] <- "EnsemblID"
@@ -114,11 +101,10 @@ normalized_counts <- normalized_counts %>% relocate(GeneName, .after = EnsemblID
 normalized_counts$GeneType <- with(normalized_counts, maps$GENEBIOTYPE[match(EnsemblID, maps$GENEID)])
 normalized_counts <- normalized_counts %>% relocate(GeneType, .after = GeneName)
 
+write.table(normalized_counts, file="normalized_countsf.txt", sep="\t", quote=F, col.names=NA)
 
-write.table(normalized_counts, file="/Users/kellyhyndman/Library/CloudStorage/Box-Box/Hyndman_Lab_Omics/BulkSEQ/23midkid/normalized_countsf.txt", sep="\t", quote=F, col.names=NA)
 
-
-#Male dehydrated vs ad
+#################Male dehydrated vs ad#############################################
 result <-results(dds, contrast=c("genotype", "male_dehy", "male_ad"), alpha = 0.05)
 head(result)
 resdata <- merge(as.data.frame(result), as.data.frame(counts(dds, normalized=TRUE)), by="row.names", sort=FALSE)
@@ -130,10 +116,10 @@ resdata$GeneType <- with(resdata, maps$GENEBIOTYPE[match(EnsemblID, maps$GENEID)
 resdata <- resdata %>% relocate(GeneType, .after = GeneName)
 
 write.csv(as.data.frame(resdata), 
-          file="/Users/kellyhyndman/Library/CloudStorage/Box-Box/Hyndman_Lab_Omics/BulkSEQ/23midkid/midkiodm_results.csv")
+          file="midkiodm_results.csv")
 
 
-##Male vs female ad
+####################Male vs female ad##############################################
 result <-results(dds, contrast=c("genotype", "male_ad", "female_ad"), alpha = 0.05)
 head(result)
 resdata <- merge(as.data.frame(result), as.data.frame(counts(dds, normalized=TRUE)), by="row.names", sort=FALSE)
@@ -145,9 +131,9 @@ resdata$GeneType <- with(resdata, maps$GENEBIOTYPE[match(EnsemblID, maps$GENEID)
 resdata <- resdata %>% relocate(GeneType, .after = GeneName)
 
 write.csv(as.data.frame(resdata), 
-          file="/Users/kellyhyndman/Library/CloudStorage/Box-Box/Hyndman_Lab_Omics/BulkSEQ/23midkid/midkidMvFadlib_results.csv")
+          file="midkidMvFadlib_results.csv")
 
-##Male vs female dehydrated
+###################Male vs female dehydrated########################################
 result <-results(dds, contrast=c("genotype", "male_dehy", "female_dehy"), alpha = 0.05)
 head(result)
 resdata <- merge(as.data.frame(result), as.data.frame(counts(dds, normalized=TRUE)), by="row.names", sort=FALSE)
@@ -159,7 +145,7 @@ resdata$GeneType <- with(resdata, maps$GENEBIOTYPE[match(EnsemblID, maps$GENEID)
 resdata <- resdata %>% relocate(GeneType, .after = GeneName)
 
 write.csv(as.data.frame(resdata), 
-          file="/Users/kellyhyndman/Library/CloudStorage/Box-Box/Hyndman_Lab_Omics/BulkSEQ/23midkid/midkidMvFdehydrated_results.csv")
+          file="midkidMvFdehydrated_results.csv")
 
 #####################Making Venn Diagrams###############################
 #need to take the numbers calculated for unique and overlap and write the code in a way that it will plot it properly.  In this case we have 2219 common genes, 629 genes in ad lib and 2 genes in dehydrated for greater in males.  For colors go here https://venn.bio-spring.top/using-ggvenndiagram
@@ -167,7 +153,7 @@ write.csv(as.data.frame(resdata),
 library(ggVennDiagram)
 library(ggplot2)
 
-####male data
+#male data
 x <- list(
   Ad_lib = 3:2850, 
   Dehydrated = 1:2221
@@ -176,7 +162,7 @@ p <-ggVennDiagram(x)
 # Blues for the males
 p + scale_fill_distiller(palette = "Blues", direction = 1)
 
-####Female data
+#Female data
 x <- list(
   Ad_lib = 1:2596, 
   Dehydrated = 909:4619
