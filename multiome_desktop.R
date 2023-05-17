@@ -105,7 +105,7 @@ sample_641 <- CreateSeuratObject(
   meta.data = metadata.641
 )
 
-# create ATAC assay and add it to the object,the assya ATAC is the original peaks called by cellranger.
+# create ATAC assay and add it to the object,the assay ATAC is the original peaks called by cellranger.
 sample_630[["ATAC"]] <- CreateChromatinAssay(
   counts = counts.630$Peaks,
   sep = c(":", "-"),
