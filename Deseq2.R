@@ -104,7 +104,7 @@ normalized_counts <- normalized_counts %>% relocate(GeneType, .after = GeneName)
 write.table(normalized_counts, file="normalized_countsf.txt", sep="\t", quote=F, col.names=NA)
 
 
-#################Male dehydrated vs ad#############################################
+#################Male dehydrated vs ad lib#############################################
 result <-results(dds, contrast=c("genotype", "male_dehy", "male_ad"), alpha = 0.05)
 head(result)
 resdata <- merge(as.data.frame(result), as.data.frame(counts(dds, normalized=TRUE)), by="row.names", sort=FALSE)
@@ -119,7 +119,7 @@ write.csv(as.data.frame(resdata),
           file="midkiodm_results.csv")
 
 
-####################Male vs female ad##############################################
+####################Male vs female ad lib##############################################
 result <-results(dds, contrast=c("genotype", "male_ad", "female_ad"), alpha = 0.05)
 head(result)
 resdata <- merge(as.data.frame(result), as.data.frame(counts(dds, normalized=TRUE)), by="row.names", sort=FALSE)
@@ -146,6 +146,8 @@ resdata <- resdata %>% relocate(GeneType, .after = GeneName)
 
 write.csv(as.data.frame(resdata), 
           file="midkidMvFdehydrated_results.csv")
+          
+#normalized counts for gene of interest were plotted with prism (Figures2-6, FigureS2, S4).
 
 #####################Making Venn Diagrams###############################
 #need to take the numbers calculated for unique and overlap and write the code in a way that it will plot it properly.  In this case we have 2219 common genes, 629 genes in ad lib and 2 genes in dehydrated for greater in males.  For colors go here https://venn.bio-spring.top/using-ggvenndiagram
@@ -158,18 +160,18 @@ x <- list(
   Ad_lib = 3:2850, 
   Dehydrated = 1:2221
 )
-p <-ggVennDiagram(x)
+FigS5B <-ggVennDiagram(x)
 # Blues for the males
-p + scale_fill_distiller(palette = "Blues", direction = 1)
+FigS5B + scale_fill_distiller(palette = "Blues", direction = 1)
 
 #Female data
 x <- list(
   Ad_lib = 1:2596, 
   Dehydrated = 909:4619
 )
-p2 <-ggVennDiagram(x)
+FigS5Bf <-ggVennDiagram(x)
 # Reds for the females
-p2 + scale_fill_distiller(palette = "Reds", direction = 1)
+FigS5Bf + scale_fill_distiller(palette = "Reds", direction = 1)
 
-p+p2+ scale_fill_distiller(palette = "Reds", direction = 1)
+FigS5B+FigS5Bf+ scale_fill_distiller(palette = "Reds", direction = 1)
 
