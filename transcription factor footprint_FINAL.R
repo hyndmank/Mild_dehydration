@@ -15,7 +15,6 @@ library(ggplot2)
 library(tidyverse)
 library(tibble)
 
-
 DefaultAssay(combined) <- 'peaks'
 Idents(combined) <-"celltype"
 Idents(combined) <-"celltype.groupid"
