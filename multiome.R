@@ -18,8 +18,8 @@ library(openxlsx)
 library(tidyverse)
 (future.globals.maxSize = 150000 * 1024^2)
 
-# create a Seurat object containing the RNA adata
-# load the RNA data
+# create a Seurat object containing the GEX data
+# load the GEX data
 counts.630 <- Read10X("~/Desktop/Dehydration/630/outs/filtered_feature_bc_matrix")
 counts.636 <- Read10X("~/Desktop/Dehydration/636/outs/filtered_feature_bc_matrix")
 counts.638 <- Read10X("~/Desktop/Dehydration/638/outs/filtered_feature_bc_matrix")
@@ -80,7 +80,7 @@ annotations <- GetGRangesFromEnsDb(ensdb = EnsDb.Mmusculus.v79)
 seqlevelsStyle(annotations) <- 'UCSC'
 genome(annotations) <- "mm10"
 
-# create a Seurat object containing the RNA adata
+# create a Seurat object containing the Gex data
 sample_630 <- CreateSeuratObject(
   counts = counts.630$`Gene Expression`,
   assay = "RNA",
@@ -472,15 +472,6 @@ DimPlot(object = combined, label = TRUE, repel = TRUE)
 p1
 saveRDS(combined, file = "~/Desktop/Dehydration/combined.rds")
 
-#get cell counts etc
-table(Idents(combined))
-table(combined$groupid)
-table(combined$sex)
-table(Idents(combined), combined$groupid)
-table(Idents(combined), combined$sex)
-prop.table(table(Idents(combined)))
-prop.table(table(Idents(combined), combined$groupid), margin = 2)
-
 #to change idents to separate con and KO. Original Clusters are in meta$seurat_clusters.  Then we can separate based on sex.
 combined$celltype.groupid <- paste(Idents(combined), combined$groupid, sep = "_")
 Idents(combined) <- "celltype.groupid"
@@ -491,6 +482,20 @@ combined$celltype.groupid.sex <- paste(Idents(combined), combined$sex, sep = "_"
 Idents(combined) <- "celltype.groupid.sex"
 
 DimPlot(object = combined, label = TRUE, repel = TRUE, reduction = 'umap.rna') + NoLegend()
+
+#get cell counts etc
+table(Idents(combined))
+table(combined$groupid)
+table(combined$sex)
+table(Idents(combined), combined$groupid)
+table(Idents(combined), combined$sex)
+prop.table(table(Idents(combined)))
+prop.table(table(Idents(combined), combined$groupid), margin = 2)
+
+#export barcode ids
+Idents(combined) <- "celltype"
+dehydrate_barcodes <-Idents(combined)
+write.csv(dehydrate_barcodes, file = "~/Desktop/combined/DEG/barcodes.csv")
 
 #DAC for clusters
 DefaultAssay(combined) <- "peaks"
@@ -534,20 +539,6 @@ data_frame = bind_rows(data_frame, .id="Sheet")
 # printing data of all sheets
 print (data_frame)
 write.xlsx(data_frame, file = "~/Desktop/Dehydration/clusterdac2.xlsx", rowNames = T)
-
-#get cell counts
-table(Idents(combined))
-table(combined$groupid)
-table(combined$sex)
-table(Idents(combined), combined$groupid)
-table(Idents(combined), combined$sex)
-prop.table(table(Idents(combined)))
-prop.table(table(Idents(combined), combined$groupid), margin = 2)
-
-#export barcode ids
-Idents(combined) <- "celltype"
-dehydrate_barcodes <-Idents(combined)
-write.csv(dehydrate_barcodes, file = "~/Desktop/combined/DEG/barcodes.csv")
 
 #DEG
 DefaultAssay(combined) <- "RNA"
