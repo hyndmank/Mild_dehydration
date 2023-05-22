@@ -132,7 +132,7 @@ enriched.motifs <- FindMotifs(
   features = top.da.peak
 )
 
-#Crem Motif 400X193
+#Crem Motif 400X193 Figure 5G.
 MotifPlot(
   object = combined,
   motifs = "CREM"
@@ -282,8 +282,8 @@ CDPC <- Footprint(
   motif.name = c("CREB1", "CREM", "NFAT5"),
   genome = BSgenome.Mmusculus.UCSC.mm10
 )
-p2 <- PlotFootprint(CDPC, features = c("CREM"), group.by = "groupid") 
-p2 + patchwork::plot_layout(ncol = 1) + NoLegend()#624x447
+Figure5H <- PlotFootprint(CDPC, features = c("CREM"), group.by = "groupid") 
+Figure5H + patchwork::plot_layout(ncol = 1) + NoLegend()#624x447
 
 #######################correlating DEG with Motifs#########################
 #ran the DEGs and Motifs separate.  Modified code from Gerhardt et al. 2023 PMID: 36735940
@@ -321,6 +321,6 @@ OVERLAP$Motif_GEX_score <- OVERLAP$motif.avg_diff* OVERLAP$GEX.avg_log2FC
 write.xlsx(OVERLAP, file = "~/Desktop/combined/TF/motif_chromvar.xlsx")
 
 #Heatmap for the TF activity and Expression
-#took the zscores and log2FC and made heatmap in prism.
+#took the zscores and log2FC and made heatmap in prism. Figure 5F.
 
 
