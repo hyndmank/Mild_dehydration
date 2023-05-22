@@ -16,12 +16,11 @@ library(BSgenome.Mmusculus.UCSC.mm10)
 library(limma)
 library(openxlsx)
 
-
 # first compute the GC content for each peak
 combined <- RegionStats(combined, genome = BSgenome.Mmusculus.UCSC.mm10)
 saveRDS(combined, file = "~/Desktop/Dehydration/combined.rds")
 
-# link peaks to genes
+# link peaks to genes of interest
 combined <- LinkPeaks(
   object = combined,
   peak.assay = "peaks",
@@ -31,18 +30,14 @@ combined <- LinkPeaks(
 
 #Visualizations Used in the publication.
 DimPlot(object = combined, label = TRUE, repel = TRUE) + NoLegend()
-DimPlot(object = combined, label = FALSE, repel = TRUE) + NoLegend() #1030x831
-DimPlot(object = combined, label = TRUE, repel = TRUE) 
-DimPlot(object = combined, label = FALSE, repel = TRUE) + NoLegend() #1205x831
-DimPlot(object = combined, label = FALSE, repel = TRUE, group.by = "groupid") #1204x831
-DimPlot(object = combined, label = FALSE, repel = TRUE, split.by = "groupid") + NoLegend() #1204x831
-DimPlot(object = combined, label = FALSE, repel = TRUE, split.by = "sex") + NoLegend() #1204x831
-DimPlot(object = combined, label = FALSE, repel = TRUE, group.by = "sex") + NoLegend() #1204x831
+DimPlot(object = combined, label = FALSE, repel = TRUE) + NoLegend() #1030x831 Figure 1A.
+DimPlot(object = combined, label = FALSE, repel = TRUE, split.by = "groupid") + NoLegend() #1204x831 Figure 1A insert.
+DimPlot(object = combined, label = FALSE, repel = TRUE, group.by = "sex") + NoLegend() #1204x831 Figure S3.
 
 #AQP2 700x400
-FeaturePlot(combined, features = "Aqp2", split.by = "groupid", min.cutoff = 0, max.cutoff =3) #
+FeaturePlot(combined, features = "Aqp2", split.by = "groupid", min.cutoff = 0, max.cutoff =3) #Figure 2A
 FeaturePlot(combined, features = "Aqp2", min.cutoff = 0, max.cutoff =3)
-#RNA summary 250x400
+#RNA summary 250x400 Figure 2B.
 VlnPlot(
   object = combined,
   assay = 'RNA',
@@ -51,7 +46,7 @@ VlnPlot(
   idents = "CDPC",
   split.by = "groupid",cols=c("darkolivegreen3", "deepskyblue")) + NoLegend() & theme(axis.title.x = element_blank(), axis.text.x = element_blank(), plot.title = element_blank(), axis.title.y = element_blank()) 
 
-#chromatin summary 250x400
+#chromatin summary 250x400 Figure 2C
 DefaultAssay(combined) <- "Gene"
 VlnPlot(
   object = combined,
@@ -62,6 +57,7 @@ VlnPlot(
   slot = "data",
   split.by = "groupid",cols=c("darkolivegreen3", "deepskyblue")) + NoLegend() & theme(axis.title.x = element_blank(), axis.text.x = element_blank(), plot.title = element_blank(), axis.title.y = element_blank()) 
 
+#Figure2D
 DefaultAssay(combined) <- "peaks"
 Idents(combined) <- "celltype.groupid"
 CoveragePlot(
@@ -71,7 +67,7 @@ CoveragePlot(
   extend.upstream = 10000,
   extend.downstream = 10000,) & scale_fill_manual(values = c("darkolivegreen3", "deepskyblue"))
 
-#AQP2 CNT
+#AQP2 CNT Figure 2E
 VlnPlot(
   object = combined,
   assay = 'RNA',
@@ -88,18 +84,8 @@ VlnPlot(
   pt.size = 0.5,
   idents = "CNT1",
   split.by = "groupid",cols=c("darkolivegreen3", "deepskyblue")) + NoLegend() & theme(axis.title.x = element_blank(), axis.text.x = element_blank(), plot.title = element_blank(), axis.title.y = element_blank()) 
-
-#coverageplot 863x300
-DefaultAssay(combined) <- "peaks"
-Idents(combined) <- "celltype.groupid"
-CoveragePlot(
-  object = combined,
-  region = "Aqp2",
-  idents = c("CNT2_adlib", "CNT2_dehydrated"),
-  extend.upstream = 10000,
-  extend.downstream = 10000)& scale_fill_manual(values = c("darkolivegreen3", "deepskyblue"))
   
-#IMCD
+#IMCD Figure 2F
 DefaultAssay(combined) <- "RNA"
 Idents(combined) <- "celltype"
 
@@ -119,8 +105,9 @@ VlnPlot(
   idents = "IMCD",
   split.by = "groupid",cols=c("darkolivegreen3", "deepskyblue")) + NoLegend() & theme(axis.title.x = element_blank(), axis.text.x = element_blank(), plot.title = element_blank(), axis.title.y = element_blank()) 
 
+#Figure 2G is normalized counts from the BulkRNA-seq and plotted in prism.
 
-#AQP3 250x400
+#AQP3 250x400 figure 3A, B
 FeaturePlot(combined, features = "Aqp3", split.by = "groupid", min.cutoff = 0, max.cutoff =3)
 VlnPlot(
   object = combined,
@@ -130,7 +117,7 @@ VlnPlot(
   idents = "CDPC",
   split.by = "groupid",cols=c("darkolivegreen3", "deepskyblue")) + NoLegend() & theme(axis.title.x = element_blank(), axis.text.x = element_blank(), plot.title = element_blank(), axis.title.y = element_blank()) 
 
-#chromatin summary 250x400
+#chromatin summary 250x400 Figure 3C
 VlnPlot(
   object = combined,
   assay = 'Gene',
@@ -139,6 +126,7 @@ VlnPlot(
   idents = "CDPC",
   split.by = "groupid",cols=c("darkolivegreen3", "deepskyblue")) + NoLegend() & theme(axis.title.x = element_blank(), axis.text.x = element_blank(), plot.title = element_blank(), axis.title.y = element_blank()) 
 
+#Figure 3D
 DefaultAssay(combined) <- "peaks"
 Idents(combined) <- "celltype.groupid"
 CoveragePlot(
@@ -148,18 +136,7 @@ CoveragePlot(
   extend.upstream = 6000,
   extend.downstream = 5000) & scale_fill_manual(values = c("darkolivegreen3", "deepskyblue"))
 
-#IMCD aqp3
-VlnPlot(
-object = combined,
-assay = 'RNA',
-features = "Aqp3",
-pt.size = 0.5,
-idents = "CNT2",
-split.by = "groupid",cols=c("darkolivegreen3", "deepskyblue")) + NoLegend() & theme(axis.title.x = element_blank(), axis.text.x = element_blank(), plot.title = element_blank(), axis.title.y = element_blank()) 
-
-
-#AQP4
-FeaturePlot(combined, features = "Aqp4", split.by = "groupid", min.cutoff = 0, max.cutoff =3)
+#AQP4 Figure 3F
 VlnPlot(
   object = combined,
   assay = 'RNA',
@@ -176,30 +153,12 @@ VlnPlot(
   idents = "CDPC",
   split.by = "groupid",cols=c("darkolivegreen3", "deepskyblue")) + NoLegend() & theme(axis.title.x = element_blank(), axis.text.x = element_blank(), plot.title = element_blank(), axis.title.y = element_blank()) 
 
-#AQP4
-VlnPlot(
-  object = combined,
-  assay = 'RNA',
-  features = "Aqp4",
-  pt.size = 0.5,
-  idents = "IMCD",
-  split.by = "groupid",cols=c("darkolivegreen3", "deepskyblue")) + NoLegend() & theme(axis.title.x = element_blank(), axis.text.x = element_blank(), plot.title = element_blank(), axis.title.y = element_blank()) 
-
-VlnPlot(
-  object = combined,
-  assay = 'Gene',
-  features = "Aqp4",
-  pt.size = 0.5,
-  idents = "IMCD",
-  split.by = "groupid",cols=c("darkolivegreen3", "deepskyblue")) + NoLegend() & theme(axis.title.x = element_blank(), axis.text.x = element_blank(), plot.title = element_blank(), axis.title.y = element_blank()) 
-
-#Grem2
+#Grem2 Figure 4A
 DefaultAssay(combined) <- "RNA"
 Idents(combined) <- "celltype"
 FeaturePlot(combined, features = "Grem2", split.by = "groupid", min.cutoff = 0, max.cutoff =3)
-FeaturePlot(combined, features = "Grem2", split.by = "sex", min.cutoff = 0, max.cutoff =3)
-FeaturePlot(combined, features = "Grem2", min.cutoff = 0, max.cutoff =3)
 
+#Figure 4B, C
 VlnPlot(
   object = combined,
   assay = 'RNA',
@@ -216,6 +175,7 @@ VlnPlot(
   idents = "CDPC",
   split.by = "groupid",cols=c("darkolivegreen3", "deepskyblue")) + NoLegend() & theme(axis.title.x = element_blank(), axis.text.x = element_blank(), plot.title = element_blank(), axis.title.y = element_blank()) 
 
+#Figure 4D
 DefaultAssay(combined) <- "peaks"
 Idents(combined) <- "celltype.groupid"
 CoveragePlot(
@@ -225,7 +185,7 @@ CoveragePlot(
   extend.upstream = 10000,
   extend.downstream = 10000) & scale_fill_manual(values = c("darkolivegreen3", "deepskyblue"))
 
-#Pde10a
+#Pde10a Figure 5.
 DefaultAssay(combined) <- "RNA"
 Idents(combined) <- "celltype"
 FeaturePlot(combined, features = "Pde10a", split.by = "groupid", min.cutoff = 0, max.cutoff =3)
@@ -255,7 +215,7 @@ CoveragePlot(
   extend.upstream = 20000,
   extend.downstream = 20000) & scale_fill_manual(values = c("darkolivegreen3", "deepskyblue"))
 
-#DCT 500x400 
+#DCT 500x400  Figure 5E, F
 DefaultAssay(combined) <- "RNA"
 Idents(combined) <- "celltype"
 VlnPlot(
@@ -274,7 +234,7 @@ VlnPlot(
   idents = c("DCT1", "DCT2"),
   split.by = "groupid",cols=c("darkolivegreen3", "deepskyblue")) + NoLegend() & theme(axis.title.x = element_blank(), axis.text.x = element_blank(), plot.title = element_blank(), axis.title.y = element_blank()) 
 
-#Podocyte 250x400
+#Podocyte 250x400 Figure 5G
 DefaultAssay(combined) <- "RNA"
 Idents(combined) <- "celltype"
 VlnPlot(
@@ -293,11 +253,40 @@ VlnPlot(
   idents = "Podocyte",
   split.by = "groupid",cols=c("darkolivegreen3", "deepskyblue")) + NoLegend() & theme(axis.title.x = element_blank(), axis.text.x = element_blank(), plot.title = element_blank(), axis.title.y = element_blank()) 
 
-#NFAT5. this was downregulated in a few cell types.500x250
+#CREM Figure 6A-D
+DefaultAssay(combined) <- "RNA"
+Idents(combined) <- "celltype"
+FeaturePlot(combined, features = "Crem", split.by = "groupid", min.cutoff = 0, max.cutoff =3)
+
+VlnPlot(
+  object = combined,
+  assay = 'RNA',
+  features = "Crem",
+  pt.size = 0.5,
+  idents = 'CDPC',
+  split.by = "groupid",cols=c("darkolivegreen3", "deepskyblue"))+ NoLegend()  & theme(axis.title.x = element_blank(), axis.text.x = element_blank(), plot.title = element_blank(), axis.title.y = element_blank()) 
+
+VlnPlot(
+  object = combined,
+  assay = 'Gene',
+  features = "Crem",
+  pt.size = 0.5,
+  idents = 'CDPC',
+  split.by = "groupid",cols=c("darkolivegreen3", "deepskyblue"))+ NoLegend()  & theme(axis.title.x = element_blank(), axis.text.x = element_blank(), plot.title = element_blank(), axis.title.y = element_blank()) 
+
+DefaultAssay(combined) <- "peaks"
+Idents(combined) <- "celltype.groupid"
+CoveragePlot(
+  object = combined,
+  region = "Crem",
+  idents = c("CDPC_adlib", "CDPC_dehydrated"),
+  extend.upstream = 10000,
+  extend.downstream = 10000, annotation = TRUE, links = TRUE) & scale_fill_manual(values = c("darkolivegreen3", "deepskyblue"))
+
+#NFAT5. 500x250 Figure S2.
 DefaultAssay(combined) <- "RNA"
 Idents(combined) <- "celltype"
 FeaturePlot(combined, features = "Nfat5", split.by = "groupid", min.cutoff = 0, max.cutoff =3)
-FeaturePlot(combined, features = "Nfat5", min.cutoff = 0, max.cutoff =3)
 
 VlnPlot(
   object = combined,
@@ -307,24 +296,7 @@ VlnPlot(
   idents = c("CNT1", "CDPC", "IMCD", "VR1"),
   split.by = "groupid",cols=c("darkolivegreen3", "deepskyblue")) + NoLegend() & theme(axis.title.x = element_blank(), axis.text.x = element_blank(), plot.title = element_blank(), axis.title.y = element_blank()) 
 
-VlnPlot(
-  object = combined,
-  assay = 'Gene',
-  features = "Nfat5",
-  pt.size = 0.5,
-  idents = "fPTS1",
-  split.by = "groupid",cols=c("darkolivegreen3", "deepskyblue")) + NoLegend() & theme(axis.title.x = element_blank(), axis.text.x = element_blank(), plot.title = element_blank(), axis.title.y = element_blank()) 
-
-DefaultAssay(combined) <- "peaks"
-Idents(combined) <- "celltype.groupid"
-CoveragePlot(
-  object = combined,
-  region = "Nfat5",
-  idents = c("IMCD_adlib", "IMCD_dehydrated"),
-  extend.upstream = 10000,
-  extend.downstream = 20000) & scale_fill_manual(values = c("darkolivegreen3", "deepskyblue"))
-
-#Aqp1
+#Aqp1 Figure S4
 DefaultAssay(combined) <- "RNA"
 Idents(combined) <- "celltype"
 FeaturePlot(combined, features = "Aqp1", split.by = "groupid", min.cutoff = 0, max.cutoff =3)
@@ -362,173 +334,3 @@ VlnPlot(
   pt.size = 0.5,
   idents = c("fPTS1", "fPTS2", "fPTS3", "fdTL"),
   split.by = "groupid",cols=c("darkolivegreen3", "deepskyblue")) + NoLegend() & theme(axis.title.x = element_blank(), axis.text.x = element_blank(), plot.title = element_blank(), axis.title.y = element_blank()) 
-
-DefaultAssay(combined) <- "peaks"
-Idents(combined) <- "celltype.groupid"
-CoveragePlot(
-  object = combined,
-  region = "Aqp1",
-  idents = c("mPTS3_adlib", "mPTS3_dehydrated"),
-  extend.upstream = 10000,
-  extend.downstream = 10000) & scale_fill_manual(values = c("darkolivegreen3", "deepskyblue"))
-
-#CREM
-DefaultAssay(combined) <- "RNA"
-Idents(combined) <- "celltype"
-FeaturePlot(combined, features = "Crem", split.by = "groupid", min.cutoff = 0, max.cutoff =3)
-VlnPlot(
-  object = combined,
-  assay = 'RNA',
-  features = "Crem",
-  pt.size = 0.5,
-  idents = 'CDPC',
-  split.by = "groupid",cols=c("darkolivegreen3", "deepskyblue"))+ NoLegend()  & theme(axis.title.x = element_blank(), axis.text.x = element_blank(), plot.title = element_blank(), axis.title.y = element_blank()) 
-
-VlnPlot(
-  object = combined,
-  assay = 'Gene',
-  features = "Crem",
-  pt.size = 0.5,
-  idents = 'CDPC',
-  split.by = "groupid",cols=c("darkolivegreen3", "deepskyblue"))+ NoLegend()  & theme(axis.title.x = element_blank(), axis.text.x = element_blank(), plot.title = element_blank(), axis.title.y = element_blank()) 
-
-VlnPlot(
-  object = combined,
-  assay = 'RNA',
-  features = "Crem",
-  pt.size = 0.5,
-  idents = c("mPTS1", "mPTS2", "mPTS3", "mdTL", "dTL", "VR1", "VR2", "VR3"),
-  split.by = "groupid",cols=c("darkolivegreen3", "deepskyblue")) + NoLegend() & theme(axis.title.x = element_blank(), axis.text.x = element_blank(), plot.title = element_blank(), axis.title.y = element_blank()) 
-
-DefaultAssay(combined) <- "peaks"
-Idents(combined) <- "celltype.groupid"
-CoveragePlot(
-  object = combined,
-  region = "Crem",
-  idents = c("CDPC_adlib", "CDPC_dehydrated"),
-  extend.upstream = 10000,
-  extend.downstream = 10000, annotation = TRUE, links = TRUE) & scale_fill_manual(values = c("darkolivegreen3", "deepskyblue"))
-
-
-#AQP5
-DefaultAssay(combined) <- "peaks"
-Idents(combined) <- "celltype.groupid"
-CoveragePlot(
-  object = combined,
-  region = "Aqp5", idents = c("CDPC_adlib", "CDPC_dehydrated"),
-    extend.upstream = 10000,
-  extend.downstream = 10000) 
-
-idents.plot <- c("CDPC_adlib", "CDPC_dehydrated")
-idents.plot.m <- c("mPTS1_adlib", "mPTS1_dehydrated", "mPTS2_adlib", "mPTS2_dehydrated", "mPTS3_adlib", "mPTS3_dehydrated")
-idents.plot.f <- c("fPTS1_adlib", "fPTS1_dehydrated", "fPTS2_adlib", "fPTS2_dehydrated", "fPTS3_adlib", "fPTS3_dehydrated")
-
-
-p1 <- CoveragePlot(
-  object = combined,
-  region = "Aqp2",
-  features = "Aqp2",
-  expression.assay = "RNA",
-  idents = idents.plot,
-  extend.upstream = 10000,
-  extend.downstream = 10000
-)
-p1
-p2 <- CoveragePlot(
-  object = combined,
-  region = "Aqp3",
-  features = "Aqp3",
-  expression.assay = "RNA",
-  idents = idents.plot,
-  extend.upstream = 8000,
-  extend.downstream = 5000
-)
-
-patchwork::wrap_plots(p1, p2, ncol = 1)
-
-p3 <- CoveragePlot(
-  object = combined,
-  region = "Aqp1",
-  features = "Aqp1",
-  expression.assay = "RNA",
-  idents = idents.plot,
-  extend.upstream = 10000,
-  extend.downstream = 10000
-)
-
-p4 <- CoveragePlot(
-  object = combined,
-  region = "Aqp4",
-  features = "Aqp4",
-  expression.assay = "RNA",
-  idents = idents.plot,
-  extend.upstream = 8000,
-  extend.downstream = 5000
-)
-p5 <- CoveragePlot(
-  object = combined,
-  region = "Avpr2",
-  features = "Avpr2",
-  expression.assay = "RNA",
-  idents = idents.plot,
-  extend.upstream = 8000,
-  extend.downstream = 5000, annotation = TRUE)
-
-
-p5 + theme(axis.title.y = element_blank(), axis.title = element_blank(), 
-                plot.title = element_blank(), legend.position = "None", 
-                axis.text.x = element_text(angle = 90), axis.text.y = element_text(angle = 90))
-
-patchwork::wrap_plots(p3, p4, ncol = 1)
-patchwork::wrap_plots(p1,p2, p4, ncol = 1)
-p5
-
-p6 <- CoveragePlot(
-  object = combined,
-  region = "Pde10a",
-  features = "Pde10a",
-  expression.assay = "RNA",
-  idents = idents.plot,
-  extend.upstream = 10000,
-  extend.downstream = 10000, annotation = TRUE)
-p6 #800x625
-p7 <- CoveragePlot(
-  object = combined,
-  region = "Atp1a1",
-  features = "Atp1a1",
-  expression.assay = "RNA",
-  idents = idents.plot,
-  extend.upstream = 8000,
-  extend.downstream = 5000, annotation = TRUE)
-p7
-
-p8 <- CoveragePlot(
-  object = combined,
-  region = "Atp1b1",
-  features = "Atp1b1",
-  expression.assay = "RNA",
-  idents = idents.plot,
-  extend.upstream = 8000,
-  extend.downstream = 5000, annotation = TRUE)
-p8
-
-p9 <- CoveragePlot(
-  object = combined,
-  region = "Aqp1",
-  features = "Aqp1",
-  expression.assay = "RNA",
-  idents = idents.plot.m,
-  extend.upstream = 8000,
-  extend.downstream = 5000, annotation = TRUE)
-p9
-
-
-p10 <- CoveragePlot(
-  object = combined,
-  region = "Aqp1",
-  features = "Aqp1",
-  expression.assay = "RNA",
-  idents = idents.plot.f,
-  extend.upstream = 8000,
-  extend.downstream = 5000, annotation = TRUE)
-p10
