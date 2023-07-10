@@ -455,6 +455,76 @@ combined <- NormalizeData(
   scale.factor = median(combined$nCount_Gene))
 saveRDS(combined, file = "~/Desktop/Dehydration/combined.rds")
 
+#also ran unsupervised clustering with peaks assay.  It required batch correction with harmony.  Although captured many of the clusters as the RNA-UMAP, it wasn't as well integrated, so we stuck with RNA UMAP for cluster annotation and downstream analyses.
+
+DepthCor(combined)
+
+#clustering with peaks assay
+combined <- RunUMAP(
+  object = combined,
+  reduction = 'lsi',
+  dims = 2:30
+)
+combined <- FindNeighbors(
+  object = combined,
+  reduction = 'lsi',
+  dims = 2:30
+)
+combined <- FindClusters(
+  object = combined,
+  algorithm = 3,
+  resolution = 0.5,
+  verbose = FALSE
+)
+
+DimPlot(object = combined.harmony, label = TRUE) 
+DimPlot(object = combined1, label = TRUE, group.by = "groupid") 
+
+#Harmony batch correction because groups are separate in dimplot
+library(harmony)
+combined.harmony <- RunHarmony(
+  object = combined1,
+  group.by.vars = 'groupid',
+  reduction = 'lsi',
+  assay.use = 'peaks',
+  project.dim = FALSE)
+
+# re-compute the UMAP using corrected LSI embeddings
+combined.harmony <- RunUMAP(combined.harmony, dims = 2:30, reduction = 'harmony')
+
+combined.harmony <- FindNeighbors(
+  object = combined.harmony,
+  reduction = 'harmony',
+  dims = 2:30)
+
+combined.harmony <- FindClusters(
+  object = combined.harmony,
+  algorithm = 3,
+  resolution = 0.5,
+  verbose = FALSE
+)
+DimPlot(object = combined.harmony, label = TRUE) 
+DimPlot(object = combined.harmony, label = FALSE)+ NoLegend()
+DimPlot(object = combined.harmony, label = TRUE, group.by = "sex") 
+p5 <- DimPlot(combined.harmony, group.by = 'groupid', pt.size = 0.1) + ggplot2::ggtitle("Harmony integration")
+p4 + p5 #1220x588
+
+GetMarkers <- function(cluster, seurat_aggregate) {
+  print(paste0("Finding dac for: ",cluster))
+  dehydrated <- seurat_aggregate
+  dac <- FindMarkers(combined.harmony, 
+                     ident.1 = cluster,    
+                     test.use = 'LR', 
+                     latent.vars = "atac_peak_region_fragments",
+                     min.pct = 0.2)
+  open <- rownames(dac)  
+  cf <- ClosestFeature(combined.harmony, regions = open)
+  return(cbind(dac, gene=cf$gene_name, distance=cf$distance))}
+
+idents <- levels(combined.harmony@meta.data$seurat_clusters)
+list.cluster.dac <- lapply(idents, function(x) {GetMarkers(x, seurat_aggregate = combined.harmony)})
+write.xlsx(list.cluster.dac, file = "~/Desktop/Dehydration/dac.combined.xlsx", sheetName = idents, rowNames = T)
+
 DefaultAssay(combined) <- "RNA"
 DefaultAssay(combined) <- "peaks"
 DefaultAssay(combined) <- "ATAC"
