@@ -3,7 +3,7 @@
 <p align="center"> Nha Van Huynh and Kelly A. Hyndman  <br>
 University of Alabama at Birmingham <br></c>
 
-Our code was modified taking into consideration the code by the [Humphreys lab](https://github.com/p4rkerw/Muto_Wilson_NComm_2020/tree/master) and the [McMahon lab](https://github.com/lmsgerhardt/Gerhardt_JASN_2022)
+Our code was modified taking into consideration the code by the [Humphreys lab](https://github.com/p4rkerw/Muto_Wilson_NComm_2020/tree/master) and the [McMahon lab](https://github.com/lmsgerhardt/Gerhardt_JASN_2022).  We also used the [FIGR package](https://github.com/buenrostrolab/FigR)
 
 10X Genomics single nucleus multiome-Seq and bulk kidney RNA-seq.  Male and female C57bl/6J mice (10-11 weeks old) were either left with water  (ad lib) or water deprived (dehydrated) for 9-11 hours.  Euthanasia and sample collection occurred +/-1 hour of midnight.
 
