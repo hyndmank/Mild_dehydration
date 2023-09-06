@@ -808,5 +808,6 @@ df <- list_of_files %>%
   map_df(~read.xlsx(.x,  colNames = TRUE), .id = "sheet_name")  
 new_df <-df %>% dplyr::filter(p_val_adj <0.05)
 write.xlsx(new_df, file = "~/Desktop/combined/DAC/Male/male_DAC.xlsx")
+saveRDS(combined, file = "~/Desktop/Dehydration/dehydration.rds")
 
 #figures and other analyses are in separate .R files
