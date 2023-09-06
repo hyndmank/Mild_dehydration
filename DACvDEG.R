@@ -22,8 +22,8 @@ txdb <- TxDb.Mmusculus.UCSC.mm10.knownGene
 library(clusterProfiler)
 library(org.Mm.eg.db)
 
-#t5n insertion like Muto et al. Figure 2.  did for male and female separately
-#dehydration separate males from females
+#t5n insertion in Figure S3.
+#dehydration separate from ad lib.  Loaded object, formerly called combined, and renamed dehydration.
 dehydration <- readRDS("/dehydration.rds")
 dehydrated <-subset(dehydration, subset = groupid == "dehydrated")
 adlib <-subset(dehydration, subset = groupid == "adlib")
@@ -147,6 +147,7 @@ write.xlsx(list.peakAnno, file = ("adlib_peakanno.xlsx"))
 
 ################DAC versus DEG for the cluster DEG and DACs (cluster of interest versus all other clusters##############
 #kept only adjusted p<0.05, import excel where each tab is a different cluster.  make sure tab cluster names are the same in the dac and deg.
+#Figure 1B
 
 DAC <- read_excel("~/Desktop/Dehydration/clusterdac.xlsx")
 DACdf <- DAC[order(DAC$gene, -abs(DAC$avg_log2FC) ), ]### sort first
@@ -174,28 +175,3 @@ quad_count_CON <- DACDEG %>%
 quad_count_CON
 
 
-###########################DEHYDRATION DAC DEG within a cluster##################################
-DAC <- read_excel("~/Desktop/combined/dehy_DAC.xlsx")
-DACdf <- DAC[order(DAC$gene, -abs(DAC$avg_log2FC) ), ]### sort first
-DACdf <- DAC %>% distinct(cluster, gene, .keep_all = TRUE) #filter distinct genes in each celltype
-
-DEG <- read_excel("~/Desktop/combined/dehy_DEG.xlsx")
-DEGdf <- DEG[order(DEG$gene, -abs(DEG$avg_log2FC) ), ]### sort first
-DEGdf <- DEG %>% distinct(cluster, gene, .keep_all = TRUE)
-
-#join the two dataframes based upon the Cell (cluster) and gene.
-DACDEG <-left_join(DEGdf, DACdf, by=c("cluster","gene"))
-write.xlsx(DACDEG, file = ("~/Desktop/combined/dehy_DACDEG.xlsx")) 
-
-#ggplot2 the data if you would like
-p <- ggplot(DACDEG, aes(x=avg_log2FC.y, y=avg_log2FC.x, label=gene,xmin=-2.5, xmax = 3, ymin =-5, ymax=8))
-p + geom_point()
-
-quad_count_CON <- DACDEG %>%
-  # Count how many with each combination of X and Y being positive
-  dplyr::count(right = avg_log2FC.y > 0, top = avg_log2FC.x > 0) %>%
-  # TRUE = 1, FALSE = 0, so these map the TRUE to +1 and FALSE to -1
-  mutate(avg_log2FC.y = 2 * (right - 0.5), avg_log2FC.x = 2 * (top - 0.5))
-quad_count_CON
-
-#downloaded files and removed rows that were not shared between the datasets. Used Prism to do correlations reported in FigS5A.
