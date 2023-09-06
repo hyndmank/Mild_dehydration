@@ -11,7 +11,7 @@ library(writexl)
 set.seed(123)
 
 ######################### All clusters #########################
-### Load Seurat object
+#Load Seurat object
 load("dehydration.RData")
 
 ############################# Ad lib ###########################
@@ -141,7 +141,7 @@ save(PC_Adlib_cisCorr.filt, file="~Desktop/PC_Adlib_cisCorr_filt.RData")
 write_xlsx(PC_Adlib_cisCorr.filt,"~Desktop/PC_Adlib_cisCorr.filtered.xlsx")
 
 ############################## PC Dehydrated ########################################
-#### Build RangedSummarizedExperiment object for ATAC from PC_Deh Seurat object
+#Build RangedSummarizedExperiment object for ATAC from PC_Deh Seurat object
 PC_Deh_ATAC.se <- SummarizedExperiment(assays=PC_Deh[["peaks"]]@counts,  
                                        rowRanges=PC_Deh[["peaks"]]@ranges)
 assayNames(PC_Deh_ATAC.se) <- "counts"
@@ -258,8 +258,8 @@ write_xlsx(PT_Deh_cisCorr.filt,"E:\\Van\\R\\PT_Deh_cisCorr.filtered.xlsx")
 ################### Heatmaps of top genes with significant peak-gene association ################################
 
 #Filtered gene-peak pairs tables to get protein-coding genes only (using EnsDb.Mmusculus.v79 gene annotation) 
-#Filter only p< 0.05
-#Choose top 50 genes with the highest correlation coefficient (rObs)
+#Filtered only p< 0.05
+#took top 50 genes with the highest correlation coefficient (rObs) in ad lib and dehydrated for heatmaps.
 
 #Draw heatmaps comparing Ad lib vs. Dehydrated 
 library(ggplot2)
