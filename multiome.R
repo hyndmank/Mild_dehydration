@@ -17,6 +17,7 @@ library(limma)
 library(openxlsx)
 library(tidyverse)
 (future.globals.maxSize = 150000 * 1024^2)
+library(harmony)
 
 # create a Seurat object containing the GEX data
 # load the GEX data
@@ -478,12 +479,12 @@ combined <- FindClusters(
 )
 
 DimPlot(object = combined.harmony, label = TRUE) 
-DimPlot(object = combined1, label = TRUE, group.by = "groupid") 
+DimPlot(object = combined.harmony, label = TRUE, group.by = "groupid") 
 
 #Harmony batch correction because groups are separate in dimplot
 library(harmony)
 combined.harmony <- RunHarmony(
-  object = combined1,
+  object = combined,
   group.by.vars = 'groupid',
   reduction = 'lsi',
   assay.use = 'peaks',
