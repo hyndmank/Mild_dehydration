@@ -47,11 +47,11 @@ Adlib_cisCorr <- FigR::runGenePeakcorr(ATAC.se = Adlib_ATAC.se,
                                        n_bg = 100)
 head(Adlib_cisCorr)
 save(Adlib_cisCorr,file="~Desktop/All_Adlib_cisCorr.RData")
-write_xlsx(Adlib_cisCorr,"~Desktop/All_Adlib_cisCorr.xlsx")
+write_xlsx(Adlib_cisCorr,"~Desktop\\All_Adlib_cisCorr.xlsx")
 
-#Filter peak-gene pair with significant association
+#Filter peak-gene pairs with significant association
 Adlib_cisCorr.filt <- Adlib_cisCorr %>% filter(pvalZ <= 0.05)
-write_xlsx(Adlib_cisCorr.filt,"~Desktop/All_Adlib_cisCorr_filtered.xlsx")
+write_xlsx(Adlib_cisCorr.filt,"~Desktop\\All_Adlib_cisCorr.filtered.xlsx")
 
 
 ############################## Dehydrated #############################################
@@ -86,11 +86,11 @@ Deh_cisCorr <- FigR::runGenePeakcorr(ATAC.se = Deh_ATAC.se,
                                      n_bg = 100)
 head(Deh_cisCorr)
 save(Deh_cisCorr,file="~Desktop/All_Deh_cisCorr.RData")
-write_xlsx(Deh_cisCorr,"~Desktop/All_Deh_cisCorr.xlsx")
+write_xlsx(Deh_cisCorr,"~Desktop\\All_Deh_cisCorr.xlsx")
 
 #Filter peak-gene pairs with significant association
 Deh_cisCorr.filt <- Deh_cisCorr %>% filter(pvalZ <= 0.05)
-write_xlsx(Deh_cisCorr.filt,"~Desktop/All_Deh_cisCorr_filtered.xlsx")
+write_xlsx(Deh_cisCorr.filt,"~Desktop\\All_Deh_cisCorr.filtered.xlsx")
 
 
 ########################## Principle cell ############################
@@ -133,12 +133,11 @@ PC_Adlib_cisCorr <- FigR::runGenePeakcorr(ATAC.se = PC_Adlib_ATAC.se,
                                           n_bg = 100)
 head(PC_Adlib_cisCorr)
 save(PC_Adlib_cisCorr,file="~Desktop/PC_Adlib_cisCorr.RData")
-write_xlsx(PC_Adlib_cisCorr,"~Desktop/PC_Adlib_cisCorr.xlsx")
+write_xlsx(PC_Adlib_cisCorr,"~Desktop\\PC_Adlib_cisCorr.xlsx")
 
 #Filter peak-gene pairs with significant association
 PC_Adlib_cisCorr.filt <- PC_Adlib_cisCorr %>% filter(pvalZ <= 0.05)
-save(PC_Adlib_cisCorr.filt, file="~Desktop/PC_Adlib_cisCorr_filt.RData")
-write_xlsx(PC_Adlib_cisCorr.filt,"~Desktop/PC_Adlib_cisCorr.filtered.xlsx")
+write_xlsx(PC_Adlib_cisCorr.filt,"~Desktop\\PC_Adlib_cisCorr.filtered.xlsx")
 
 ############################## PC Dehydrated ########################################
 #Build RangedSummarizedExperiment object for ATAC from PC_Deh Seurat object
@@ -167,12 +166,11 @@ PC_Deh_cisCorr <- FigR::runGenePeakcorr(ATAC.se = PC_Deh_ATAC.se,
                                         n_bg = 100)
 head(PC_Deh_cisCorr)
 save(PC_Deh_cisCorr,file="~Desktop/PC_Deh_cisCorr.RData")
-write_xlsx(PC_Deh_cisCorr,"~Desktop/PC_Deh_cisCorr.xlsx")
+write_xlsx(PC_Deh_cisCorr,"~Desktop\\PC_Deh_cisCorr.xlsx")
 
 #Filter peak-gene pairs with significant association
 PC_Deh_cisCorr.filt <- cisCorr %>% filter(pvalZ <= 0.05)
-save(PC_Deh_cisCorr.filt, file="~Desktop/PC_Deh_cisCorr_filt.RData")
-write_xlsx(PC_Deh_cisCorr.filt,"~Desktop/PC_Deh_cisCorr.filtered.xlsx")
+write_xlsx(PC_Deh_cisCorr.filt,"~Desktop\\PC_Deh_cisCorr.filtered.xlsx")
 
 ############################# Proximal tubules ################################
 #Subset PT Seurat
@@ -213,12 +211,11 @@ PT_Adlib_cisCorr <- FigR::runGenePeakcorr(ATAC.se = PT_Adlib_ATAC.se,
                                           n_bg = 100)
 head(PT_Adlib_cisCorr)
 save(PT_Adlib_cisCorr,file="~Desktop/PT_Adlib_cisCorr.RData")
-write_xlsx(PT_Adlib_cisCorr,"~Desktop/PT_Adlib_cisCorr.xlsx")
+write_xlsx(PT_Adlib_cisCorr,"~Desktop\\PT_Adlib_cisCorr.xlsx")
 
 #Filter peak-gene pairs with significant association
 PT_Adlib_cisCorr.filt <- PT_Adlib_cisCorr %>% filter(pvalZ <= 0.05)
-save(PT_Adlib_cisCorr.filt, file="~Desktop/PT_Adlib_cisCorr_filt.RData")
-write_xlsx(PT_Adlib_cisCorr.filt,"~Desktop/PT_Adlib_cisCorr.filtered.xlsx")
+write_xlsx(PT_Adlib_cisCorr.filt,"~Desktop\\PT_Adlib_cisCorr.filtered.xlsx")
 
 ###################### PT Dehydrated ########################
 #Build RangedSummarizedExperiment object for ATAC from PT_Deh Seurat object
@@ -246,20 +243,18 @@ PT_Deh_cisCorr <- FigR::runGenePeakcorr(ATAC.se = PT_Deh_ATAC.se,
                                         n_bg = 100)
 
 head(PT_Deh_cisCorr)
-save(PT_Deh_cisCorr,file="E:/Van/R/PT_Deh_cisCorr.RData")
-write_xlsx(PT_Deh_cisCorr,"E:\\Van\\R\\PT_Deh_cisCorr.xlsx")
+save(PT_Deh_cisCorr,file="~Desktop/PT_Deh_cisCorr.RData")
+write_xlsx(PT_Deh_cisCorr,"~Desktop\\PT_Deh_cisCorr.xlsx")
 
 #Filter peak-gene pairs with significant association
 PT_Deh_cisCorr.filt <- cisCorr %>% filter(pvalZ <= 0.05)
-save(PT_Deh_cisCorr.filt, file="E:/Van/R/PT_Deh_cisCorr_filt.RData")
-write_xlsx(PT_Deh_cisCorr.filt,"E:\\Van\\R\\PT_Deh_cisCorr.filtered.xlsx")
+write_xlsx(PT_Deh_cisCorr.filt,"~Desktop\\PT_Deh_cisCorr.filtered.xlsx")
 
 
 ################### Heatmaps of top genes with significant peak-gene association ################################
 
-#Filtered gene-peak pairs tables to get protein-coding genes only (using EnsDb.Mmusculus.v79 gene annotation) 
-#Filtered only p< 0.05
-#took top 50 genes with the highest correlation coefficient (rObs) in ad lib and dehydrated for heatmaps.
+#Filtered gene-peak pairs from *_cisCorr.filtered tables to get protein-coding genes only (using EnsDb.Mmusculus.v79 gene annotations) 
+#Took top 50 genes with the highest correlation coefficients (rObs) in ad lib and dehydrated for heatmaps
 
 #Draw heatmaps comparing Ad lib vs. Dehydrated 
 library(ggplot2)
