@@ -17,4 +17,4 @@ For the bulk RNA-seq cohort:  FA1	female ad lilb 1, FA2	female ad lilb 2, FA3	fe
 Fastq files were trimmed with [Trim_Galore](https://github.com/FelixKrueger/TrimGalore), mapped with [Star](https://github.com/alexdobin/STAR), and counts with featurecounts function of [subread](https://subread.sourceforge.net).  All normalization and differentially expressed genes were calucated using the [Deseq2 package](https://bioconductor.org/packages/release/bioc/html/DESeq2.html).
 
 
-<b>Publication:</b> Mild dehydration effects on the murine kidney single nucleus transcriptome and chromatin accessibility.  Nha Van Huynh, Cassidy Rehage, and Kelly A. Hyndman, University of Alabama at Birmingham, Department of Medicine, Division of Nephrology, Section of Cardio-Renal Physiology and Medicine, Birmingham, AL 35233.  Under Review with American Journal of Physiology: Renal Physiology.
+<b>Publication:</b> Mild dehydration effects on the murine kidney single nucleus transcriptome and chromatin accessibility.  2023.  Nha Van Huynh, Cassidy Rehage, and Kelly A. Hyndman.  Under Review with American Journal of Physiology: Renal Physiology.
